@@ -1,0 +1,10 @@
+Dungeon has both static lights and rooms. Reason for this is because lights can be mapped to rooms. Should never need update method.
+
+point is: entity = all non constant, dynamic things in the world
+level/dungeon = all static things which always have and always will exist in the world
+	
+Components:
+	Agent (holds state, body(s))
+	StatsSystem
+	
+MESSAGES SHOULD BE USED ONLY TO COMMUNICATE BETWEEN ENTITIES. AND ALL ENTITY COMMUNICATIONS SHOULD BE VIA MESSAGES.
