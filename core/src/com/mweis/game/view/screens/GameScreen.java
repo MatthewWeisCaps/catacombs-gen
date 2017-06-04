@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -19,6 +18,11 @@ import com.mweis.game.entity.component.AgentComponent;
 import com.mweis.game.entity.systems.AgentSystem;
 import com.mweis.game.util.Constants;
 import com.mweis.game.view.Screen;
+import com.mweis.game.world.Dungeon;
+import com.mweis.game.world.DungeonFactory;
+import com.mweis.game.world.WorldFactory;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 
 public class GameScreen implements Screen {
 	
@@ -27,20 +31,23 @@ public class GameScreen implements Screen {
 	private Body playerBody; // for quick ref
 	
 	private Box2DDebugRenderer renderer;
+	private RayHandler rayHandler;
 	private OrthographicCamera camera;
 	
-	private World world;
+	private World world; // ref to dungeon world for now
+	private Dungeon dungeon;
 	
 	@Override
 	public void show() {
 		
-		world = new World(Vector2.Zero, true);
-		engine = new Engine();
+		dungeon = new Dungeon(DungeonFactory.generateDungeon());//new Dungeon(10, 10, world);
+		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f);
 		
+		engine = new Engine();
 		engine.addSystem(new AgentSystem(Constants.DELTA_TIME));
 		
 		player = new Entity();
-		playerBody = Box2dBodyFactory.createDynamicSquare(Vector2.Zero, world);
+		playerBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter(), world);
 		
 		Agent<PlayerAgent, PlayerState> agent = new PlayerAgent(playerBody);
 		AgentComponent<PlayerAgent, PlayerState> ac = new AgentComponent<PlayerAgent, PlayerState>(agent);
@@ -49,6 +56,13 @@ public class GameScreen implements Screen {
 		engine.addEntity(player);
 		
 		renderer = new Box2DDebugRenderer();
+		rayHandler = new RayHandler(world);
+		rayHandler.setBlurNum(2);
+		
+		PointLight light = new PointLight(rayHandler, 1000); // attached to player
+		light.setSoftnessLength(5.0f);
+		light.setDistance(100.0f);
+		light.attachToBody(playerBody);
 		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
@@ -66,13 +80,17 @@ public class GameScreen implements Screen {
 		camera.position.set(position);
 		camera.update();
 		
-		renderer.render(world, camera.combined);
+//		dungeon.render(camera.combined);
+		rayHandler.setCombinedMatrix(camera);
+		rayHandler.render();
+//		renderer.render(world, camera.combined);
 	}
 
 	@Override
 	public void update() {
 		engine.update(GdxAI.getTimepiece().getDeltaTime());
 		world.step(GdxAI.getTimepiece().getDeltaTime(), 8, 3);
+		rayHandler.update();
 	}
 
 	@Override

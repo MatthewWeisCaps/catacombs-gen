@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Java
 
 *.class
@@ -112,3 +113,27 @@ gradle-app.setting
 ## OS Specific
 .DS_Store
 Thumbs.db
+=======
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+>>>>>>> 002e5beb86fe01a4a4eb0c4f23249cfc64724f1c
