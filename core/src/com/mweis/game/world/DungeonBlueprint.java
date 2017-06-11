@@ -3,6 +3,9 @@ package com.mweis.game.world;
 import com.badlogic.gdx.utils.Array;
 import com.mweis.game.world.graph.DGraph;
 
+/*
+ * Using a blueprint to build the dungeon will make saving/loading dungeons much easier.
+ */
 class DungeonBlueprint {
 	
 	private Room start;

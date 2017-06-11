@@ -12,7 +12,7 @@ public enum PlayerState implements State<PlayerAgent> {
 		
 		@Override
 		public void enter(PlayerAgent entity) {
-			System.out.println("entered");
+			
 		}
 
 		@Override

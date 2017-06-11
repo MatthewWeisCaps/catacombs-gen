@@ -8,3 +8,7 @@ Components:
 	StatsSystem
 	
 MESSAGES SHOULD BE USED ONLY TO COMMUNICATE BETWEEN ENTITIES. AND ALL ENTITY COMMUNICATIONS SHOULD BE VIA MESSAGES.
+
+
+zombies all have a PointLight called "vision," which they can use to poll for enemies.
+ - if one zombie spots an enemy, they emit a message to all zombies within a radius.

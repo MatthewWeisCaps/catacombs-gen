@@ -14,9 +14,12 @@ import com.mweis.game.box2d.Box2dBodyFactory;
 import com.mweis.game.entity.Agent;
 import com.mweis.game.entity.agents.player.PlayerAgent;
 import com.mweis.game.entity.agents.player.PlayerState;
+import com.mweis.game.entity.agents.zombie.ZombieAgent;
+import com.mweis.game.entity.agents.zombie.ZombieState;
 import com.mweis.game.entity.component.AgentComponent;
 import com.mweis.game.entity.systems.AgentSystem;
 import com.mweis.game.util.Constants;
+import com.mweis.game.util.Mappers;
 import com.mweis.game.view.Screen;
 import com.mweis.game.world.Dungeon;
 import com.mweis.game.world.DungeonFactory;
@@ -40,11 +43,16 @@ public class GameScreen implements Screen {
 	@Override
 	public void show() {
 		
-		dungeon = new Dungeon(DungeonFactory.generateDungeon());//new Dungeon(10, 10, world);
+		dungeon = new Dungeon(DungeonFactory.generateDungeon());
 		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f);
 		
 		engine = new Engine();
 		engine.addSystem(new AgentSystem(Constants.DELTA_TIME));
+		
+		renderer = new Box2DDebugRenderer();
+		rayHandler = new RayHandler(world);
+		rayHandler.setBlurNum(2);
+		
 		
 		player = new Entity();
 		playerBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter(), world);
@@ -55,9 +63,15 @@ public class GameScreen implements Screen {
 		
 		engine.addEntity(player);
 		
-		renderer = new Box2DDebugRenderer();
-		rayHandler = new RayHandler(world);
-		rayHandler.setBlurNum(2);
+		Entity testZombie = new Entity();
+		Body zombieBody = Box2dBodyFactory.createDynamicSquare(dungeon.getEndRoom().getCenter(), world);
+		
+		Agent<ZombieAgent, ZombieState> zagent = new ZombieAgent((PlayerAgent)Mappers.agentMapper.get(player).agent,
+				zombieBody, 6.0f, rayHandler);
+		testZombie.add(new AgentComponent<ZombieAgent, ZombieState>(zagent));
+		
+		engine.addEntity(testZombie);
+		
 		
 		PointLight light = new PointLight(rayHandler, 1000); // attached to player
 		light.setSoftnessLength(5.0f);
@@ -80,10 +94,10 @@ public class GameScreen implements Screen {
 		camera.position.set(position);
 		camera.update();
 		
-//		dungeon.render(camera.combined);
+		dungeon.render(camera.combined);
 		rayHandler.setCombinedMatrix(camera);
 		rayHandler.render();
-//		renderer.render(world, camera.combined);
+		renderer.render(world, camera.combined);
 	}
 
 	@Override

@@ -1,12 +1,10 @@
 package com.mweis.game.world;
 
-import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -87,9 +85,7 @@ public class Dungeon {
 		this.PARTITION_WIDTH = (int) Math.ceil((double)this.WIDTH / this.UNITS_PER_PARTITION);
 		this.spatialPartition = this.createSpatialParition();
 		
-		this.dungeonGraph = this.createDungeonGraph();
-		
-//		MessageManager.getInstance().addListener(this, Messages.SOLICIT.ENTITY_SPAWNED);
+		this.dungeonGraph = this.createDungeonGraph();		
 	}
 	
 	public Array<Room> getDungeon() {
