@@ -3,8 +3,6 @@ package com.mweis.game.entity.agents.zombie;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.math.Vector2;
 
 public enum ZombieState implements State<ZombieAgent> {
 	/*

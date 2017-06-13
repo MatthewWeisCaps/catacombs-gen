@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mweis.game.box2d.Box2dBodyFactory;
+import com.mweis.game.box2d.Box2dLightFactory;
 import com.mweis.game.entity.Agent;
 import com.mweis.game.entity.agents.player.PlayerAgent;
 import com.mweis.game.entity.agents.player.PlayerState;
@@ -72,11 +73,7 @@ public class GameScreen implements Screen {
 		
 		engine.addEntity(testZombie);
 		
-		
-		PointLight light = new PointLight(rayHandler, 1000); // attached to player
-		light.setSoftnessLength(5.0f);
-		light.setDistance(100.0f);
-		light.attachToBody(playerBody);
+		PointLight light = Box2dLightFactory.createPointLight(rayHandler, 1000, 100.0f, playerBody);
 		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
