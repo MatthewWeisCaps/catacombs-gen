@@ -24,6 +24,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mweis.game.util.FilterCategory;
 
 /** A raycast collision detector for box2d.
  * 
@@ -66,8 +67,18 @@ public class Box2dRaycastCollisionDetector implements RaycastCollisionDetector<V
 		@Override
 		public float reportRayFixture (Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
 			if (outputCollision != null) outputCollision.set(point, normal);
-			collided = true;
-			return fraction;
+			
+			short worldMask = FilterCategory.BOUNDARY.getBits(); //  
+			if ((fixture.getFilterData().categoryBits & worldMask) == 0) {
+				collided = false;
+				return -1;
+			} else {
+				collided = true;
+//				System.out.println((fixture.getFilterData().categoryBits + ", " + worldMask));
+//				System.out.println((fixture.getFilterData().categoryBits & worldMask));
+//				System.out.println("collided? " + collided + ", with: " + fixture.getFilterData().categoryBits);
+				return fraction;
+			}
 		}
 	}
 }

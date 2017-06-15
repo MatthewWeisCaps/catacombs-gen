@@ -5,8 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
-import com.mweis.game.box2d.Box2dSteeringUtils;
 import com.mweis.game.util.Constants;
 import com.mweis.game.view.ScreenManager;
 import com.mweis.game.view.screens.GameScreen;
@@ -19,28 +17,6 @@ public class Game implements ApplicationListener {
 	public void create() {
 		Gdx.graphics.setTitle("Game");
 		ScreenManager.setScreen(new GameScreen());
-		
-		// coord systems display
-//		System.out.println("====");
-//		Vector2 v1 = new Vector2(1.0f, 0.0f);
-//		Vector2 v2 = new Vector2(1.0f, 1.0f);
-//		Vector2 v3 = new Vector2(0.0f, 1.0f);
-//		Vector2 v4 = new Vector2(-1.0f, 1.0f);
-//		Vector2 v5 = new Vector2(-1.0f, 0.0f);
-//		Vector2 v6 = new Vector2(-1.0f, -1.0f);
-//		Vector2 v7 = new Vector2(0.0f, -1.0f);
-//		Vector2 v8 = new Vector2(1.0f, -1.0f);
-//		
-//		System.out.println(Math.toDegrees(v1.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v1)));
-//		System.out.println(Math.toDegrees(v2.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v2)));
-//		System.out.println(Math.toDegrees(v3.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v3)));
-//		System.out.println(Math.toDegrees(v4.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v4)));
-//		System.out.println(Math.toDegrees(v5.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v5)));
-//		System.out.println(Math.toDegrees(v6.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v6)));
-//		System.out.println(Math.toDegrees(v7.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v7)));
-//		System.out.println(Math.toDegrees(v8.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v8)));
-////		System.out.println(Math.toDegrees(v9.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v9)));
-////		System.out.println(Math.toDegrees(v10.angleRad()) + ", " + Math.toDegrees(Box2dSteeringUtils.vectorToAngle(v10)));
 	}
 
 	@Override

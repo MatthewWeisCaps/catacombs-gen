@@ -34,7 +34,7 @@ public enum ZombieState implements State<ZombieAgent> {
 		@Override
 		public boolean onMessage(ZombieAgent entity, Telegram telegram) {
 			if (telegram.message == 0) { // new enemy to chase
-				entity.seek.setTarget((Agent)telegram.extraInfo);
+				entity.arriveSB.setTarget((Agent)telegram.extraInfo);
 				entity.getStateMachine().changeState(ZombieState.SEEK);
 				return true;
 			}
@@ -50,18 +50,22 @@ public enum ZombieState implements State<ZombieAgent> {
 //			if (entity.seek.getTarget() == null) {
 //				entity.getStateMachine().revertToPreviousState();
 //			}
-			entity.seek.setEnabled(true);
-			entity.steering.setSteeringBehavior(entity.seek);
+			entity.arriveSB.setEnabled(true);
+			entity.prioritySB.setEnabled(true);
+			entity.steering.setSteeringBehavior(entity.prioritySB);
 		}
 
 		@Override
 		public void update(ZombieAgent entity) {
+			if (entity.prioritySB.getSelectedBehaviorIndex() == 0) {
+//				System.out.println("avoiding obsticle");
+			}
 			entity.steering.update(GdxAI.getTimepiece().getDeltaTime());
 		}
 
 		@Override
 		public void exit(ZombieAgent entity) {
-			entity.seek.setEnabled(false);
+			entity.seekSB.setEnabled(false);
 		}
 
 		@Override

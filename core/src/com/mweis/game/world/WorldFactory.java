@@ -355,10 +355,10 @@ public class WorldFactory {
 		
 		World world = new World(Vector2.Zero, true);
 		
-//		Array<PointRectangle> rectangles = new Array<PointRectangle>(false, 100); // should use this one! much faster w/o ordering
-		Array<PointRectangle> rectangles = new Array<PointRectangle>();
+		Array<PointRectangle> rectangles = new Array<PointRectangle>(false, dungeon.getDungeon().size*3); // should use this one! much faster w/o ordering
+//		Array<PointRectangle> rectangles = new Array<PointRectangle>();
 		
-		verticalTileMerge(rectangles, dungeon, precision);
+		verticalTileMerge(rectangles, dungeon, precision); // this is the Love2d algorithm
 		horizontalTileMerge(rectangles, dungeon, precision);
 		
 		
@@ -371,9 +371,7 @@ public class WorldFactory {
 		/*
 		 * Any box2d objects bigger than the permitted size need to be cut into half until they are small enough
 		 */
-
 		sliceLargeRectangles(rectangles, dungeon);
-		
 		closeSmallGapsBetweenWalls(rectangles, world, dungeon, precision);
 		
 		/*

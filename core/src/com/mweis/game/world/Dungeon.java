@@ -21,7 +21,7 @@ public class Dungeon {
 	public final int WIDTH, HEIGHT, MIN_SIDE_LENGTH, MAX_SIDE_LENGTH, HALL_WIDTH,
 		CORRIDOR_COUNT, ROOM_COUNT, HALL_COUNT,
 		// adjust this if units walking through walls is an issue:
-		MAX_BOX2D_STATIC_BODY_SIZE = 50; // no effect if body size less than 2*blockSize
+		MAX_BOX2D_STATIC_BODY_SIZE = 50; // no effect if body size less than 2*blockSize (?changed?)
 	public final float MIN_RATIO, MAX_RATIO;
 	
 	private Room startRoom, endRoom;
@@ -29,8 +29,8 @@ public class Dungeon {
 	private DGraph<Room> criticalRoomGraph;
 	private DGraph<Room> dungeonGraph;
 	
-	public final int UNITS_PER_PARTITION = 5, // width and height of each partition square
-			ESTIMATED_MAX_ROOMS_PER_PARTITION = 16, // used for init cap of ObjectSet, THIS IS ALWAYS ROUNDED UP TO NEXT POWER OF TWO
+	public final int UNITS_PER_PARTITION = 30, // width and height of each partition square
+			ESTIMATED_MAX_ROOMS_PER_PARTITION = 12, // used for init cap of ObjectSet, THIS IS ALWAYS ROUNDED UP TO NEXT POWER OF TWO
 			PARTITION_WIDTH; // with in CHUNKS
 	private final IntMap<Array<Room>> spatialPartition; // where Integer is x+y*unitsPerPartition coord
 	
@@ -200,6 +200,9 @@ public class Dungeon {
 	
 	
 	ShapeRenderer sr = new ShapeRenderer();
+	/*
+	 * DEBUG RENDERING!
+	 */
 	public void render(Matrix4 combined) {
 		sr.setProjectionMatrix(combined);
 	    sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -397,6 +400,7 @@ public class Dungeon {
 			potentialRooms = this.getPotentialRoomsInArea(area);
 			
 		}
+		
 			// perform a bounds check on the potential rooms
 			Array<Room> rooms = new Array<Room>(potentialRooms.size);
 			for (Room room : potentialRooms) {			

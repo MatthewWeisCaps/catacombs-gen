@@ -19,6 +19,8 @@ public class Box2dBodyFactory {
 		bodyDef.position.set(position);
 		
 		Body body = world.createBody(bodyDef);
+		body.setLinearDamping(0.10f);
+		body.setAngularDamping(0.50f);
 		
 		PolygonShape polygon = new PolygonShape();
 		polygon.setAsBox(1.0f, 1.0f); // this is half-width and half-height, thus a 2x2 meter box
@@ -26,9 +28,9 @@ public class Box2dBodyFactory {
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = polygon;
-		fixtureDef.density = 0.90f;
-		fixtureDef.friction = 0.25f;
-		fixtureDef.restitution = 0.10f;
+		fixtureDef.density = 1.0f;
+		fixtureDef.friction = 0.15f;
+		fixtureDef.restitution = 0.0f;
 		
 		filter.copyToFixture(fixtureDef);
 		

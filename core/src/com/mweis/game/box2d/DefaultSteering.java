@@ -3,6 +3,8 @@ package com.mweis.game.box2d;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
+import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
+import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -112,6 +114,7 @@ public class DefaultSteering implements Steerable<Vector2> {
 
 	public void update (float deltaTime) {
 		if (steeringBehavior != null) {
+			
 			// Calculate steering acceleration
 			steeringBehavior.calculateSteering(steeringOutput);
 			/*
@@ -121,6 +124,16 @@ public class DefaultSteering implements Steerable<Vector2> {
 			 * faster it moves, the slower it can turn (without going into a skid); it can brake much more quickly than it can
 			 * accelerate; and it only moves in the direction it is facing (ignoring power slides).
 			 */
+			
+//			if (steeringBehavior instanceof PrioritySteering) {
+//				PrioritySteering<Vector2> ps = (PrioritySteering<Vector2>) steeringBehavior;
+//				if (ps.getSelectedBehaviorIndex() == 0) {
+//					System.out.println("here");
+//					steeringOutput.linear.x *= -1f;
+//					steeringOutput.linear.y *= -1f;
+////					steeringOutput.linear.o
+//				}
+//			}
 
 			// Apply steering acceleration
 			applySteering(steeringOutput, deltaTime);
@@ -227,7 +240,7 @@ public class DefaultSteering implements Steerable<Vector2> {
 
 	@Override
 	public float getZeroLinearSpeedThreshold () {
-		return 0.001f;
+		return 0.0001f;
 	}
 
 	@Override
