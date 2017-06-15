@@ -7,7 +7,8 @@ import com.mweis.game.entity.Agent;
 public class PlayerAgent extends Agent<PlayerAgent, PlayerState> {
 	
 	public PlayerAgent(Body body) {
-		super.setBody(body);
+		super(body);
+//		super.setBody(body);
 		super.setStateMachine(new DefaultStateMachine<PlayerAgent, PlayerState>(this));
 		super.getStateMachine().changeState(PlayerState.DEFAULT);
 	}

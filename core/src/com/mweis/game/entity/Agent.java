@@ -14,6 +14,11 @@ public abstract class Agent<A extends Agent<A, S>, S extends State<A>> implement
 	private Body body; // collisions occur between fixtures, not bodies. Therefore a "hitbox" and "collisionbox" can both exist still.
 	private StateMachine<A, S> stateMachine;
 	
+	protected Agent(Body body) {
+		this.setBody(body);
+		this.getBody().setUserData(this);
+	}
+	
 	public Body getBody() {
 		return this.body;
 	}

@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mweis.game.box2d.Box2dBodyFactory;
+import com.mweis.game.box2d.Box2dFilterBuilder;
+import com.mweis.game.util.FilterCategory;
 
 // a different way of representing rectangles, consistent with the TileMerging algorithm
 class PointRectangle implements Comparable<PointRectangle> {
@@ -55,7 +57,6 @@ class PointRectangle implements Comparable<PointRectangle> {
 }
 
 public class WorldFactory {
-	
 	
 	/*
 	 * TileMerging algorithm from https://love2d.org/wiki/TileMerging, this merges into VERTICAL WALLS ONLY
@@ -265,7 +266,10 @@ public class WorldFactory {
 //				System.out.format("sx: %d, sy: %d, width: %d, height: %d%n", sx, sy, width, height);
 //			}
 			
-			Box2dBodyFactory.createStaticRectangle(sx, sy, width, height, world);
+			Box2dFilterBuilder worldFilter = new Box2dFilterBuilder(FilterCategory.BOUNDARY);
+			worldFilter.enableAllMaskCategories();
+			
+			Box2dBodyFactory.createStaticRectangle(sx, sy, width, height, worldFilter, world);
 		}
 	}
 	
@@ -277,10 +281,14 @@ public class WorldFactory {
 		Vector2 bottom_right = new Vector2(dungeon.WIDTH, 0);
 		Vector2 top_left = new Vector2(0, dungeon.HEIGHT);
 		Vector2 top_right = new Vector2(dungeon.WIDTH, dungeon.HEIGHT);
-		Box2dBodyFactory.createEdge(top_left, top_right, world); // top
-		Box2dBodyFactory.createEdge(bottom_left, bottom_right, world); // bottom
-		Box2dBodyFactory.createEdge(bottom_left, top_left, world); // left
-		Box2dBodyFactory.createEdge(bottom_right, top_right, world); // right
+		
+		Box2dFilterBuilder worldFilter = new Box2dFilterBuilder(FilterCategory.BOUNDARY);
+		worldFilter.enableAllMaskCategories();
+		
+		Box2dBodyFactory.createEdge(top_left, top_right, worldFilter, world); // top
+		Box2dBodyFactory.createEdge(bottom_left, bottom_right, worldFilter, world); // bottom
+		Box2dBodyFactory.createEdge(bottom_left, top_left, worldFilter, world); // left
+		Box2dBodyFactory.createEdge(bottom_right, top_right, worldFilter, world); // right
 	}
 	
 	private static void closeSmallGapsBetweenWalls(Array<PointRectangle> rectangles, World world, Dungeon dungeon, float precision) {
@@ -342,7 +350,7 @@ public class WorldFactory {
 	public static World createWorldFromDungeon(Dungeon dungeon, float precision, float minimumWallWidth) {
 		
 		if (precision < 0.25f) {
-			Gdx.app.error("WorldFactory", "Precision below 0.25f is unstable", new IllegalArgumentException());
+			Gdx.app.error("WorldFactory", "Precision below 0.25f is extremely unstable", new IllegalArgumentException());
 		}
 		
 		World world = new World(Vector2.Zero, true);

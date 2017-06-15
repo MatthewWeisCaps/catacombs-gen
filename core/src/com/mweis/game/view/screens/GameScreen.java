@@ -11,15 +11,18 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mweis.game.box2d.Box2dBodyFactory;
+import com.mweis.game.box2d.Box2dFilterBuilder;
 import com.mweis.game.box2d.Box2dLightFactory;
 import com.mweis.game.entity.Agent;
 import com.mweis.game.entity.agents.player.PlayerAgent;
 import com.mweis.game.entity.agents.player.PlayerState;
 import com.mweis.game.entity.agents.zombie.ZombieAgent;
 import com.mweis.game.entity.agents.zombie.ZombieState;
-import com.mweis.game.entity.component.AgentComponent;
+import com.mweis.game.entity.components.AgentComponent;
+import com.mweis.game.entity.listeners.BodyContactListener;
 import com.mweis.game.entity.systems.AgentSystem;
 import com.mweis.game.util.Constants;
+import com.mweis.game.util.FilterCategory;
 import com.mweis.game.util.Mappers;
 import com.mweis.game.view.Screen;
 import com.mweis.game.world.Dungeon;
@@ -46,17 +49,25 @@ public class GameScreen implements Screen {
 		
 		dungeon = new Dungeon(DungeonFactory.generateDungeon());
 		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f);
+		world.setContactListener(new BodyContactListener());
+		
 		
 		engine = new Engine();
 		engine.addSystem(new AgentSystem(Constants.DELTA_TIME));
 		
-		renderer = new Box2DDebugRenderer();
+		renderer = new Box2DDebugRenderer(true, true, true, true, true, true);
 		rayHandler = new RayHandler(world);
 		rayHandler.setBlurNum(2);
 		
+		/*
+		 * PLAYER
+		 */
 		
 		player = new Entity();
-		playerBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter(), world);
+		Box2dFilterBuilder playerFilter = new Box2dFilterBuilder(FilterCategory.FRIENDLY_MOB);
+		playerFilter.enableAllMaskCategories();
+		
+		playerBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter(), playerFilter, world);
 		
 		Agent<PlayerAgent, PlayerState> agent = new PlayerAgent(playerBody);
 		AgentComponent<PlayerAgent, PlayerState> ac = new AgentComponent<PlayerAgent, PlayerState>(agent);
@@ -64,16 +75,22 @@ public class GameScreen implements Screen {
 		
 		engine.addEntity(player);
 		
-		Entity testZombie = new Entity();
-		Body zombieBody = Box2dBodyFactory.createDynamicSquare(dungeon.getEndRoom().getCenter(), world);
+		/*
+		 * TEST ENEMY
+		 */
 		
-		Agent<ZombieAgent, ZombieState> zagent = new ZombieAgent((PlayerAgent)Mappers.agentMapper.get(player).agent,
-				zombieBody, 6.0f, rayHandler);
+		Entity testZombie = new Entity();
+		Box2dFilterBuilder zombieFilter = new Box2dFilterBuilder(FilterCategory.ENEMY_MOB);
+		zombieFilter.enableAllMaskCategories();
+		
+		Body zombieBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter().cpy().add(5, 5), zombieFilter, world);
+		
+		Agent<ZombieAgent, ZombieState> zagent = new ZombieAgent(zombieBody, rayHandler);
 		testZombie.add(new AgentComponent<ZombieAgent, ZombieState>(zagent));
 		
 		engine.addEntity(testZombie);
 		
-		PointLight light = Box2dLightFactory.createPointLight(rayHandler, 1000, 100.0f, playerBody);
+//		PointLight light = Box2dLightFactory.createPointLight(rayHandler, 1000, 100.0f, playerBody);
 		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();

@@ -1,4 +1,4 @@
-package com.mweis.game.entity.component;
+package com.mweis.game.entity.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.ai.fsm.State;

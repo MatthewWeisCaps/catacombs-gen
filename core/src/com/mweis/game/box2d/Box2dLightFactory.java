@@ -16,20 +16,19 @@ public class Box2dLightFactory {
 	/*
 	 * @param Body body - can be null!
 	 */
-	public static ConeLight createConeLight(RayHandler rayHandler, int rays, float distance, float angle, Body body) {
-		ConeLight light = new ConeLight(rayHandler, rays, Color.WHITE, distance, 0.0f, 0.0f, 0.0f, angle);
+	public static ConeLight createConeLight(RayHandler rayHandler, int rays, float distance, float orientation, float coneAngle, Body body) {
+		ConeLight light = new ConeLight(rayHandler, rays, Color.WHITE, distance, 0.0f, 0.0f, orientation, coneAngle / 2.0f);
 		
 		Box2dFilterBuilder builder = new Box2dFilterBuilder(FilterCategory.LIGHT);
 		builder.enableAllMaskCategories(); // collide with everything...
 		builder.disableMaskBit(FilterCategory.SENSOR); // ... except sensors
-//		builder.disableMaskBit(FilterCategory.BOUNDARY);
-		
 		
 		light.setContactFilter(builder.build());
 		
 		if (body != null) {
-			light.attachToBody(body);
+			light.attachToBody(body, 0.0f, 0.0f, orientation);
 		}
+		
 		return light;
 	}
 	
@@ -44,7 +43,6 @@ public class Box2dLightFactory {
 		Box2dFilterBuilder builder = new Box2dFilterBuilder(FilterCategory.LIGHT);
 		builder.enableAllMaskCategories(); // collide with everything...
 		builder.disableMaskBit(FilterCategory.SENSOR); // ... except sensors
-//		builder.disableMaskBit(FilterCategory.BOUNDARY);
 		
 		light.setContactFilter(builder.build());
 		

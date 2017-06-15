@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalIteratingSystem;
 import com.mweis.game.entity.Agent;
-import com.mweis.game.entity.component.AgentComponent;
+import com.mweis.game.entity.components.AgentComponent;
 import com.mweis.game.util.Mappers;
 
 public class AgentSystem extends IntervalIteratingSystem {

@@ -12,3 +12,17 @@ MESSAGES SHOULD BE USED ONLY TO COMMUNICATE BETWEEN ENTITIES. AND ALL ENTITY COM
 
 zombies all have a PointLight called "vision," which they can use to poll for enemies.
  - if one zombie spots an enemy, they emit a message to all zombies within a radius.
+ 
+ 
+ 
+ CONTACTS:
+ 
+ body has: agent or NULL (possible a body will exist with a collision effect but no agency)
+ fixture has: Consumer<Fixture, Fixture>(selfFixture, otherFixture) or NULL if there is no action to perform
+ 
+ when a contact occurs, both 
+ 	
+ sensors can be:
+ 	- detecting damagebox of player
+ 	- detecting entities entering / leaving aoe or spell
+ 	- a field of vision

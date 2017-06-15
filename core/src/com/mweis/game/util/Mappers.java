@@ -1,7 +1,7 @@
 package com.mweis.game.util;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.mweis.game.entity.component.AgentComponent;
+import com.mweis.game.entity.components.AgentComponent;
 
 public final class Mappers {
 	@SuppressWarnings("rawtypes")

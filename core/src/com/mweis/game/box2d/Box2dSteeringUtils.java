@@ -5,7 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 public final class Box2dSteeringUtils {
 
 	public static float vectorToAngle (Vector2 vector) {
-		return (float)Math.atan2(-vector.x, vector.y);
+//		return (float)vector.angleRad(); // for "zero to the right" axis
+		return (float)Math.atan2(-vector.x, vector.y); // 0 is up axis
 	}
 
 	public static Vector2 angleToVector (Vector2 outVector, float angle) {

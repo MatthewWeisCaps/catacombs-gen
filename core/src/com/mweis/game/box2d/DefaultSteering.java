@@ -126,6 +126,7 @@ public class DefaultSteering implements Steerable<Vector2> {
 			applySteering(steeringOutput, deltaTime);
 		}
 	}
+
 	
 	protected void applySteering (SteeringAcceleration<Vector2> steering, float deltaTime) {
 		boolean anyAccelerations = false;

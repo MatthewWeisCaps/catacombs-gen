@@ -1,8 +1,13 @@
 package com.mweis.game.entity.agents.zombie;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.steer.behaviors.Seek;
+import com.badlogic.gdx.math.Vector2;
+import com.mweis.game.entity.Agent;
 
 public enum ZombieState implements State<ZombieAgent> {
 	/*
@@ -11,20 +16,14 @@ public enum ZombieState implements State<ZombieAgent> {
 	IDLE() {
 		@Override
 		public void enter(ZombieAgent entity) {
-			entity.getBody().setLinearVelocity(0, 0);
+			entity.getBody().setLinearVelocity(0.0f, 0.0f);
 			entity.getBody().setAngularVelocity(0.0f);
 			entity.getBody().setAwake(false);
 		}
 
 		@Override
 		public void update(ZombieAgent entity) {
-			// this needs to be off a conical fixture
-			if (entity.vision.contains(entity.player.getBody().getPosition().x, entity.player.getBody().getPosition().y)) {
-				System.out.println("coll");
-				entity.seek.setTarget(entity.player);
-				entity.getStateMachine().changeState(ZombieState.SEEK);
-				// TODO: send message to nearby zombies
-			}
+
 		}
 
 		@Override
@@ -34,6 +33,11 @@ public enum ZombieState implements State<ZombieAgent> {
 
 		@Override
 		public boolean onMessage(ZombieAgent entity, Telegram telegram) {
+			if (telegram.message == 0) { // new enemy to chase
+				entity.seek.setTarget((Agent)telegram.extraInfo);
+				entity.getStateMachine().changeState(ZombieState.SEEK);
+				return true;
+			}
 			return false;
 		}
 	},
@@ -43,6 +47,9 @@ public enum ZombieState implements State<ZombieAgent> {
 	SEEK() {
 		@Override
 		public void enter(ZombieAgent entity) {
+//			if (entity.seek.getTarget() == null) {
+//				entity.getStateMachine().revertToPreviousState();
+//			}
 			entity.seek.setEnabled(true);
 			entity.steering.setSteeringBehavior(entity.seek);
 		}

@@ -5,11 +5,11 @@ package com.mweis.game.util;
  */
 public enum FilterCategory {
 	
-	BOUNDARY((short) 0x01),
-	SENSOR((short) 0x02), // exists so raycasts can avoid
-	LIGHT((short) 0x04),
-	FRIENDLY_MOB((short) 0x08),
-	ENEMY_MOB((short) 0x10);
+	BOUNDARY((short) 2),
+	SENSOR((short) 4), // exists so raycasts can avoid
+	LIGHT((short) 8),
+	FRIENDLY_MOB((short) 16),
+	ENEMY_MOB((short) 32);
 	
 	private final short bits;
 	FilterCategory(short bits) {
