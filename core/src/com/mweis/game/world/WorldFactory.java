@@ -258,6 +258,7 @@ public class WorldFactory {
 			if (dungeon.getPotentialRoomsInArea(new Rectangle(sx, sy, width, height)).size == 0) {
 				continue; // skip any rooms with no use
 			}
+			
 			height = Math.max(height, minimumWallWidth);
 			width = Math.max(width, minimumWallWidth);
 			

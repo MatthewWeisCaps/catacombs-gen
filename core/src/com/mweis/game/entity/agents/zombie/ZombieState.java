@@ -47,9 +47,6 @@ public enum ZombieState implements State<ZombieAgent> {
 	SEEK() {
 		@Override
 		public void enter(ZombieAgent entity) {
-//			if (entity.seek.getTarget() == null) {
-//				entity.getStateMachine().revertToPreviousState();
-//			}
 			entity.arriveSB.setEnabled(true);
 			entity.prioritySB.setEnabled(true);
 			entity.steering.setSteeringBehavior(entity.prioritySB);
@@ -57,15 +54,12 @@ public enum ZombieState implements State<ZombieAgent> {
 
 		@Override
 		public void update(ZombieAgent entity) {
-			if (entity.prioritySB.getSelectedBehaviorIndex() == 0) {
-//				System.out.println("avoiding obsticle");
-			}
 			entity.steering.update(GdxAI.getTimepiece().getDeltaTime());
 		}
 
 		@Override
 		public void exit(ZombieAgent entity) {
-			entity.seekSB.setEnabled(false);
+			entity.prioritySB.setEnabled(false);
 		}
 
 		@Override

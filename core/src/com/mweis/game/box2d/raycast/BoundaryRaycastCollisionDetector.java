@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.mweis.game.box2d;
+package com.mweis.game.box2d.raycast;
 
 import com.badlogic.gdx.ai.utils.Collision;
 import com.badlogic.gdx.ai.utils.Ray;
@@ -29,16 +29,16 @@ import com.mweis.game.util.FilterCategory;
 /** A raycast collision detector for box2d.
  * 
  * @author davebaol */
-public class Box2dRaycastCollisionDetector implements RaycastCollisionDetector<Vector2> {
+public class BoundaryRaycastCollisionDetector implements RaycastCollisionDetector<Vector2> {
 
 	World world;
 	Box2dRaycastCallback callback;
 
-	public Box2dRaycastCollisionDetector (World world) {
+	public BoundaryRaycastCollisionDetector (World world) {
 		this(world, new Box2dRaycastCallback());
 	}
 
-	public Box2dRaycastCollisionDetector (World world, Box2dRaycastCallback callback) {
+	public BoundaryRaycastCollisionDetector (World world, Box2dRaycastCallback callback) {
 		this.world = world;
 		this.callback = callback;
 	}
@@ -71,12 +71,9 @@ public class Box2dRaycastCollisionDetector implements RaycastCollisionDetector<V
 			short worldMask = FilterCategory.BOUNDARY.getBits(); //  
 			if ((fixture.getFilterData().categoryBits & worldMask) == 0) {
 				collided = false;
-				return -1;
+				return -1; // MUST RETURN -1 IF NO COLLISION OCCURS
 			} else {
 				collided = true;
-//				System.out.println((fixture.getFilterData().categoryBits + ", " + worldMask));
-//				System.out.println((fixture.getFilterData().categoryBits & worldMask));
-//				System.out.println("collided? " + collided + ", with: " + fixture.getFilterData().categoryBits);
 				return fraction;
 			}
 		}

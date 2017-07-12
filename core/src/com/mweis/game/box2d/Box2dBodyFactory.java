@@ -3,16 +3,17 @@ package com.mweis.game.box2d;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
 
 public class Box2dBodyFactory {
 	
-	public static Body createDynamicSquare(Vector2 position, Box2dFilterBuilder filter, World world) {
+	public static Body createDynamicCircle(Vector2 position, Box2dFilterBuilder filter, World world) {
 		BodyDef bodyDef = new BodyDef();
 		
 		bodyDef.type = BodyType.DynamicBody;
@@ -21,13 +22,17 @@ public class Box2dBodyFactory {
 		Body body = world.createBody(bodyDef);
 		body.setLinearDamping(0.10f);
 		body.setAngularDamping(0.50f);
+		body.setFixedRotation(true);
 		
-		PolygonShape polygon = new PolygonShape();
-		polygon.setAsBox(1.0f, 1.0f); // this is half-width and half-height, thus a 2x2 meter box
+		CircleShape circle = new CircleShape();
+		circle.setRadius(1.0f);
+		
+//		PolygonShape polygon = new PolygonShape();
+//		polygon.setAsBox(1.0f, 1.0f); // this is half-width and half-height, thus a 2x2 meter box
 
 		
 		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = polygon;
+		fixtureDef.shape = circle;
 		fixtureDef.density = 1.0f;
 		fixtureDef.friction = 0.15f;
 		fixtureDef.restitution = 0.0f;
@@ -35,8 +40,9 @@ public class Box2dBodyFactory {
 		filter.copyToFixture(fixtureDef);
 		
 		Fixture fixture = body.createFixture(fixtureDef);
-
-		polygon.dispose();
+		
+		circle.dispose();
+//		polygon.dispose();
 		
 		return body;
 	}

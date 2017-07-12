@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Vector2;
+import com.mweis.game.box2d.Box2dSteeringUtils;
 import com.mweis.game.util.Constants;
 import com.mweis.game.view.ScreenManager;
 import com.mweis.game.view.screens.GameScreen;

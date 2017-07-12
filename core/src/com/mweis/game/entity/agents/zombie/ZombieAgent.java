@@ -4,10 +4,13 @@ import java.util.function.BiConsumer;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
+import com.badlogic.gdx.ai.steer.behaviors.FollowPath;
 import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.ai.steer.behaviors.Pursue;
 import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
 import com.badlogic.gdx.ai.steer.behaviors.Seek;
+import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
+import com.badlogic.gdx.ai.steer.utils.paths.LinePath.LinePathParam;
 import com.badlogic.gdx.ai.steer.utils.rays.CentralRayWithWhiskersConfiguration;
 import com.badlogic.gdx.ai.steer.utils.rays.ParallelSideRayConfiguration;
 import com.badlogic.gdx.ai.steer.utils.rays.SingleRayConfiguration;
@@ -20,8 +23,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mweis.game.box2d.Box2dFilterBuilder;
 import com.mweis.game.box2d.Box2dLightFactory;
-import com.mweis.game.box2d.Box2dRaycastCollisionDetector;
 import com.mweis.game.box2d.DefaultSteering;
+import com.mweis.game.box2d.raycast.BoundaryRaycastCollisionDetector;
 import com.mweis.game.entity.Agent;
 import com.mweis.game.entity.components.ContactComponent;
 import com.mweis.game.util.Constants;
@@ -33,12 +36,13 @@ public class ZombieAgent extends Agent<ZombieAgent, ZombieState> {
 	
 	ConeLight vision;
 	DefaultSteering steering;
-	Seek<Vector2> seekSB;
+	
+//	Seek<Vector2> seekSB;
 	Arrive<Vector2> arriveSB;
-	
-	
-	RaycastObstacleAvoidance<Vector2> raycastSB;
 	PrioritySteering<Vector2> prioritySB;
+	RaycastObstacleAvoidance<Vector2> raycastSB;
+	FollowPath<Vector2, LinePathParam> pathSB;
+	
 //	public SingleRayConfiguration<Vector2> singleRayConfig; // public for temp debugging
 	public CentralRayWithWhiskersConfiguration<Vector2> whiskerRayConfig;
 	
@@ -97,7 +101,7 @@ public class ZombieAgent extends Agent<ZombieAgent, ZombieState> {
 		// use +90.0f for up-is-zero orientation
 		this.vision = Box2dLightFactory.createConeLight(rayHandler, 500, distance, +90.0f, coneAngle, body);
 		
-		float boundingRadius = 1.0f; // side of box by default in factory. all these need to be moved to xml file
+		float boundingRadius = 1.0f; // radius of circle by default in factory. all these need to be moved to xml file
 		this.steering = new DefaultSteering(super.getBody(), false, boundingRadius);
 		float speedFactor = 5.0f;
 		
@@ -107,13 +111,30 @@ public class ZombieAgent extends Agent<ZombieAgent, ZombieState> {
 		steering.setMaxAngularAcceleration(0);
 		steering.setMaxAngularSpeed(0);
 		
-		this.seekSB = new Seek<Vector2>(steering);
+//		this.seekSB = new Seek<Vector2>(steering);
+		
+		/*
+		 * setup arrive steering
+		 */
 		this.arriveSB = new Arrive<Vector2>(steering);
 		this.arriveSB.setArrivalTolerance(4.0f);
 		this.arriveSB.setDecelerationRadius(10.0f);
 		
+		
+		/*
+		 * setup path following
+		 */
+		
+//		LinePath<Vector2> linePath = new LinePath<Vector2>()
+//		LinePathParam lpp = new LinePathParam();
+//		pathSB = new FollowPath<Vector2, LinePathParam>(this.steering, null);
+		
+		
+		/*
+		 * setup raycast avoidance
+		 */
 		float raycastDistance = 14.0f;
-		RaycastCollisionDetector<Vector2> rcd = new Box2dRaycastCollisionDetector(world);
+		RaycastCollisionDetector<Vector2> rcd = new BoundaryRaycastCollisionDetector(world);
 		
 //		singleRayConfig = new SingleRayConfiguration<Vector2>(this.steering, raycastDistance);
 		

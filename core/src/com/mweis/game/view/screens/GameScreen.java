@@ -31,6 +31,7 @@ import com.mweis.game.util.Mappers;
 import com.mweis.game.view.Screen;
 import com.mweis.game.world.Dungeon;
 import com.mweis.game.world.DungeonFactory;
+import com.mweis.game.world.HexDungeon;
 import com.mweis.game.world.WorldFactory;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
@@ -46,13 +47,22 @@ public class GameScreen implements Screen {
 	private OrthographicCamera camera;
 	
 	private World world; // ref to dungeon world for now
-	private Dungeon dungeon;
+//	private Dungeon dungeon;
+	private HexDungeon dungeon;
 	
 	@Override
 	public void show() {
 		
-		dungeon = new Dungeon(DungeonFactory.generateDungeon());
-		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f); // IF SLOW LOADING TIME, be less precise (increase value)
+		// hex change
+//		dungeon = new Dungeon(DungeonFactory.generateDungeon());
+//		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f); // IF SLOW LOADING TIME, be less precise (increase value)
+		
+		// hex change
+		world = new World(Vector2.Zero, true);
+		dungeon = new HexDungeon(world);
+		
+		
+		
 		world.setContactListener(new BodyContactListener());
 		
 		
@@ -63,6 +73,7 @@ public class GameScreen implements Screen {
 		rayHandler = new RayHandler(world);
 		rayHandler.setBlurNum(2);
 		rayHandler.setAmbientLight(0.1f, 0.1f, 0.1f, 0.085f);
+//		rayHandler.setAmbientLight(1.0f, 1.0f, 1.0f, 0.3f);
 		
 		/*
 		 * PLAYER
@@ -72,7 +83,9 @@ public class GameScreen implements Screen {
 		Box2dFilterBuilder playerFilter = new Box2dFilterBuilder(FilterCategory.FRIENDLY_MOB);
 		playerFilter.enableAllMaskCategories();
 		
-		playerBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter(), playerFilter, world);
+//		playerBody = Box2dBodyFactory.createDynamicCircle(dungeon.getStartRoom().getCenter(), playerFilter, world);
+		// hex change
+		playerBody = Box2dBodyFactory.createDynamicCircle(Vector2.Zero, playerFilter, world);
 		
 		Agent<PlayerAgent, PlayerState> agent = new PlayerAgent(playerBody);
 		AgentComponent<PlayerAgent, PlayerState> ac = new AgentComponent<PlayerAgent, PlayerState>(agent);
@@ -88,14 +101,19 @@ public class GameScreen implements Screen {
 		Box2dFilterBuilder zombieFilter = new Box2dFilterBuilder(FilterCategory.ENEMY_MOB);
 		zombieFilter.enableAllMaskCategories();
 		
-		Body zombieBody = Box2dBodyFactory.createDynamicSquare(dungeon.getStartRoom().getCenter().cpy().add(5, 5), zombieFilter, world);
+		
+//		Body zombieBody = Box2dBodyFactory.createDynamicCircle(dungeon.getStartRoom().getCenter().cpy().add(5, 5), zombieFilter, world);
+		// hex change
+		Body zombieBody = Box2dBodyFactory.createDynamicCircle(new Vector2(5.0f, 5.0f), zombieFilter, world);
+
+		
 		
 		Agent<ZombieAgent, ZombieState> zagent = new ZombieAgent(zombieBody, rayHandler, world);
 		testZombie.add(new AgentComponent<ZombieAgent, ZombieState>(zagent));
 		
 		engine.addEntity(testZombie);
 		
-		
+		// small light on player
 		PointLight light = Box2dLightFactory.createPointLight(rayHandler, 1000, 30.0f, playerBody);
 		
 		float w = Gdx.graphics.getWidth();
@@ -114,7 +132,9 @@ public class GameScreen implements Screen {
 		camera.position.set(position);
 		camera.update();
 		
-		dungeon.render(camera.combined);
+		// hex change
+//		dungeon.render(camera.combined);
+		
 		rayHandler.setCombinedMatrix(camera);
 		rayHandler.render();
 		renderer.render(world, camera.combined);

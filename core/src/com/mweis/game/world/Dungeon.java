@@ -1,7 +1,10 @@
 package com.mweis.game.world;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -9,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.IntMap.Keys;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.mweis.game.world.Room.RoomType;
 import com.mweis.game.world.graph.DGraph;
 import com.mweis.game.world.graph.Edge;
@@ -28,6 +32,7 @@ public class Dungeon {
 	private Array<Room> noncriticalRooms, criticalRooms, allRooms, halls, dungeon;
 	private DGraph<Room> criticalRoomGraph;
 	private DGraph<Room> dungeonGraph;
+	private DGraph<Vector2> hallwayGraph;
 	
 	public final int UNITS_PER_PARTITION = 30, // width and height of each partition square
 			ESTIMATED_MAX_ROOMS_PER_PARTITION = 12, // used for init cap of ObjectSet, THIS IS ALWAYS ROUNDED UP TO NEXT POWER OF TWO
@@ -85,7 +90,8 @@ public class Dungeon {
 		this.PARTITION_WIDTH = (int) Math.ceil((double)this.WIDTH / this.UNITS_PER_PARTITION);
 		this.spatialPartition = this.createSpatialParition();
 		
-		this.dungeonGraph = this.createDungeonGraph();		
+		this.dungeonGraph = this.createDungeonGraph();	
+		this.hallwayGraph = this.createHallwayGraph();
 	}
 	
 	public Array<Room> getDungeon() {
@@ -150,6 +156,192 @@ public class Dungeon {
 		}
 	}
 	
+	/*
+	 * precondition: dungeonGraph is completed
+	 * creates a graph of Vector2's which can be used for pathfinding algorithms.
+	 */
+	Array<Vector2> points = new Array<Vector2>();
+	private DGraph<Vector2> createHallwayGraph() {
+		
+		DGraph<Vector2> graph = new DGraph<Vector2>();
+		// because a hallway will always connect two rooms, we use this as a reference for graph building
+//		for (Room hall : this.getHalls()) {
+//			for (Room room : this.getDungeon()) {
+//				if (room.getType() == RoomType.CRITICAL) { // this also implicitly checks that hall != room
+//					if (hall.touches(room)) {
+//						float dist = hall.getCenter().dst(room.getCenter());						
+//						if (!graph.hasKey(hall.getCenter())) {
+//							graph.addKey(hall.getCenter());
+//						}
+//						graph.addConnection(hall.getCenter(), new Edge<Vector2>(hall.getCenter(), room.getCenter(), dist));
+//						
+//						if (!graph.hasKey(room.getCenter())) {
+//							graph.addKey(room.getCenter());
+//						}
+//						graph.addConnection(room.getCenter(), new Edge<Vector2>(room.getCenter(), hall.getCenter(), dist));
+//					}
+//				}
+//			}
+//		}
+	
+		for (Room criticalRoom : this.getDungeonGraph().getKeys()) {
+			if (criticalRoom.getType() == RoomType.CRITICAL) {
+				for (Connection<Room> roomToHall : this.getDungeonGraph().getConnections(criticalRoom)) {
+					Room hall = roomToHall.getToNode();
+					if (hall.getType() == RoomType.HALLWAY) {
+						// if a criticalRoom -> hall connection exists
+						float dist = hall.getCenter().dst(criticalRoom.getCenter());						
+						if (!graph.hasKey(hall.getCenter())) {
+							graph.addKey(hall.getCenter());
+						}
+						graph.addConnection(hall.getCenter(), new Edge<Vector2>(hall.getCenter(), criticalRoom.getCenter(), dist));
+						
+						if (!graph.hasKey(criticalRoom.getCenter())) {
+							graph.addKey(criticalRoom.getCenter());
+						}
+						graph.addConnection(criticalRoom.getCenter(), new Edge<Vector2>(criticalRoom.getCenter(), hall.getCenter(), dist));
+					}
+				}
+			}
+		}
+		
+		/*
+		 * Key insight is that associated hallways are always added together!
+		 * so we can iterate in pairs
+		 * 
+		 * .ILL NOT WORKING! HALLS PATHS CAN OVERLAP COLLIDERS
+		 */
+		for (int i=0, j = 1; i < getHalls().size; i += 2, j += 2) {
+			
+//			for (int j=i+1; j < getHalls().size; j++) {
+				Room h1 = getHalls().get(i);
+				Room h2 = getHalls().get(j);
+				
+//				if (h1.touches(h2)) {
+					
+					float minTop = Math.min(h1.getTop(), h2.getTop());
+					float maxBot = Math.min(h1.getBottom(), h2.getBottom());
+					float maxLeft = Math.min(h1.getLeft(), h2.getLeft());
+					float minRight = Math.min(h1.getRight(), h2.getRight());
+					
+					float verticalDiff = minTop - maxBot;
+					float horizontalDiff = minRight - maxLeft;
+					
+					Vector2 overlapMidpoint = new Vector2(maxLeft + horizontalDiff/2.0f, maxBot + verticalDiff/2.0f);
+					points.add(overlapMidpoint);
+					graph.addKey(overlapMidpoint);
+					
+					if (!graph.hasKey(h1.getCenter())) {
+						graph.addKey(h1.getCenter());
+					}
+					graph.addConnection(h1.getCenter(), new Edge<Vector2>(h1.getCenter(), overlapMidpoint,
+							h1.getCenter().dst(overlapMidpoint)));
+//					System.out.println(overlapMidpoint + ", " + h1.getCenter());
+					
+					graph.addConnection(overlapMidpoint, new Edge<Vector2>(overlapMidpoint, h1.getCenter(),
+							h1.getCenter().dst(overlapMidpoint)));
+					
+					if (!graph.hasKey(h2.getCenter())) {
+						graph.addKey(h2.getCenter());
+					}
+					graph.addConnection(h2.getCenter(), new Edge<Vector2>(h2.getCenter(), overlapMidpoint,
+							h2.getCenter().dst(overlapMidpoint)));
+					graph.addConnection(overlapMidpoint, new Edge<Vector2>(overlapMidpoint, h2.getCenter(),
+							h2.getCenter().dst(overlapMidpoint)));
+					
+					
+//					Vector2 h1Enter = null;
+//					Vector2 h2Enter = null;
+//					
+//					boolean h1Horizontal = h1.getWidth() > h1.getHeight();
+//					boolean h2Horizontal = h2.getWidth() > h2.getHeight();
+//					
+////					if (h1Horizontal == h2Horizontal) { // skip over halls not meant to intersect
+////						continue;
+////					}
+//					
+//					if (h1Horizontal) {  // if horizontal hallway
+//						// check if the overlapMidpoint is closer to left or right to get orientation
+//						if (Math.abs(h1.getLeft() - overlapMidpoint.x) < Math.abs(h1.getRight() - overlapMidpoint.x)) {
+//							// opening is on right
+//							h1Enter = new Vector2(h1.getRight(), h1.getCenterY()); //overlapMidpoint.y);
+//						} else {
+//							// opening is on left
+//							h1Enter = new Vector2(h1.getLeft(), h1.getCenterY()); //overlapMidpoint.y);
+//						}
+//					} else { // if vertical hallway
+//						// check if the overlapMidpoint is closer to top or bottom to get orientation
+//						if (Math.abs(h1.getBottom() - overlapMidpoint.y) < Math.abs(h1.getTop() - overlapMidpoint.y)) {
+//							// opening is on top
+////							h1Enter = new Vector2(overlapMidpoint.x, h1.getTop());
+//							h1Enter = new Vector2(h1.getCenterX(), h1.getTop());
+//						} else {
+//							// opening is on bottom
+//							h1Enter = new Vector2(h1.getCenterX(), h1.getBottom());
+//						}
+//					}
+//					
+//					if (h2Horizontal) {  // if horizontal hallway
+//						// check if the overlapMidpoint is closer to left or right to get orientation
+//						if (Math.abs(h2.getLeft() - overlapMidpoint.x) < Math.abs(h2.getRight() - overlapMidpoint.x)) {
+//							// opening is on right
+//							h2Enter = new Vector2(h2.getRight(), h2.getCenterY()); //overlapMidpoint.y);
+//						} else {
+//							// opening is on left
+//							h2Enter = new Vector2(h2.getLeft(), h2.getCenterY()); //overlapMidpoint.y);
+//						}
+//					} else { // if vertical hallway
+//						// check if the overlapMidpoint is closer to top or bottom to get orientation
+//						if (Math.abs(h2.getBottom() - overlapMidpoint.y) < Math.abs(h2.getTop() - overlapMidpoint.y)) {
+//							// opening is on top
+//							h2Enter = new Vector2(h2.getCenterX(), h2.getTop());
+//						} else {
+//							// opening is on bottom
+//							h2Enter = new Vector2(h2.getCenterX(), h2.getBottom());
+//						}
+//					}
+//					
+//					graph.addKey(overlapMidpoint);
+//					graph.addKey(h1Enter);
+//					graph.addKey(h2Enter);
+//					
+//					// connect midpoint to room
+//					graph.addConnection(h1Enter, new Edge<Vector2>(h1Enter, overlapMidpoint,
+//							h1Enter.dst(overlapMidpoint)));
+//					graph.addConnection(overlapMidpoint, new Edge<Vector2>(overlapMidpoint, h1Enter,
+//							h1Enter.dst(overlapMidpoint)));
+//					
+//					graph.addConnection(h2Enter, new Edge<Vector2>(h2Enter, overlapMidpoint,
+//							h2Enter.dst(overlapMidpoint)));
+//					graph.addConnection(overlapMidpoint, new Edge<Vector2>(overlapMidpoint, h2Enter,
+//							h2Enter.dst(overlapMidpoint)));
+					
+					
+					
+//					if (!graph.hasKey(h1.getCenter())) {
+//						graph.addKey(h1.getCenter());
+//					}
+//					graph.addConnection(h1.getCenter(), new Edge<Vector2>(h1.getCenter(), overlapMidpoint,
+//							h1.getCenter().dst(overlapMidpoint)));
+//					graph.addConnection(overlapMidpoint, new Edge<Vector2>(overlapMidpoint, h1.getCenter(),
+//							h1.getCenter().dst(overlapMidpoint)));
+//					
+//					if (!graph.hasKey(h2.getCenter())) {
+//						graph.addKey(h2.getCenter());
+//					}
+//					graph.addConnection(h2.getCenter(), new Edge<Vector2>(h2.getCenter(), overlapMidpoint,
+//							h2.getCenter().dst(overlapMidpoint)));
+//					graph.addConnection(overlapMidpoint, new Edge<Vector2>(overlapMidpoint, h2.getCenter(),
+//							h2.getCenter().dst(overlapMidpoint)));
+					
+//				}
+//			}
+		}
+		
+		
+		return graph;
+	}
+	
 	private DGraph<Room> createDungeonGraph() {
 		/*
 		 * Rooms connect iff a hall passes through them
@@ -161,7 +353,7 @@ public class Dungeon {
 			for (Room room : this.getDungeon()) {
 				if (room.getType() != RoomType.HALLWAY) { // this also implicitly checks that hall != room
 					if (hall.touches(room)) {
-						float dist = new Vector2(hall.getCenterX(), hall.getCenterY()).dst(new Vector2(room.getCenterX(), room.getCenterY()));						
+						float dist = hall.getCenter().dst(room.getCenter());						
 						if (!graph.hasKey(hall)) {
 							graph.addKey(hall);
 						}
@@ -180,8 +372,9 @@ public class Dungeon {
 			for (int j=i+1; j < getHalls().size; j++) {
 				Room h1 = getHalls().get(i);
 				Room h2 = getHalls().get(j);
+				
 				if (h1.touches(h2)) {
-					float dist = new Vector2(h1.getCenterX(), h1.getCenterY()).dst(new Vector2(h2.getCenterX(), h2.getCenterY()));
+					float dist = h1.getCenter().dst(h2.getCenter());
 					if (!graph.hasKey(h1)) {
 						graph.addKey(h1);
 					}
@@ -200,6 +393,7 @@ public class Dungeon {
 	
 	
 	ShapeRenderer sr = new ShapeRenderer();
+	private boolean displayFullGraph = false;
 	/*
 	 * DEBUG RENDERING!
 	 */
@@ -223,13 +417,14 @@ public class Dungeon {
 		sr.setColor(Color.GOLD);
 		sr.rect(endRoom.getLeft(), endRoom.getBottom(), endRoom.getWidth(), endRoom.getHeight());
 		
+		sr.end();
+		sr.begin(ShapeRenderer.ShapeType.Line);
+		
+		
 		sr.setColor(Color.RED);
 		for (Room halls : getHalls()) {
 			sr.rect(halls.getLeft(), halls.getBottom(), halls.getWidth(), halls.getHeight());
 		}
-		
-		sr.end();
-		sr.begin(ShapeRenderer.ShapeType.Line);
 		
 		// DRAW SPATIAL PARTITION
 //		sr.setColor(Color.BLACK);
@@ -240,32 +435,48 @@ public class Dungeon {
 //			sr.rect(x, y, UNITS_PER_PARTITION, UNITS_PER_PARTITION);
 //		}
 		
-		// DRAW CRITICAL GRAPH
-//		sr.setColor(Color.CYAN);
-//		for (Room start : criticalRoomGraph.keySet()) {
-//			for (Room end : criticalRoomGraph.get(start)) {
-//				sr.line(start.getCenterX(), start.getCenterY(), end.getCenterX(), end.getCenterY());
-//			}
-//		}
 		
-		// DRAW DUNGEON GRAPH
-//		sr.setColor(Color.BLACK);
-//		for (Room room : dungeonGraph.getKeys()) {
-//			for (Connection<Room> edge : dungeonGraph.getConnections(room)) {
-//				Room a = edge.getToNode();
-//				Room b = edge.getFromNode();
-//				sr.line(a.getCenterX(), a.getCenterY(), b.getCenterX(), b.getCenterY());
-//			}
-//		}
+		if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.T)) {
+			displayFullGraph = !displayFullGraph;
+		}
 		
-		// DRAW TEST GRAPH
-//		sr.setColor(Color.WHITE);
-//		for (Room a : testMap.keySet()) {
-//			for (Room b : testMap.get(a)) {
-//				sr.line(a.getCenterX(), a.getCenterY(), b.getCenterX(), b.getCenterY());
+		if (displayFullGraph) {
+			// DRAW CRITICAL GRAPH
+			sr.setColor(Color.CYAN);
+//			for (Room start : criticalRoomGraph.getKeys()) {
+//				for (Connection<Room> endC : criticalRoomGraph.getConnections(start)) {
+//					Room end = endC.getToNode() == start ? endC.getFromNode() : endC.getToNode();
+//					sr.line(start.getCenterX(), start.getCenterY(), end.getCenterX(), end.getCenterY());
+//				}
 //			}
-//		}
+			
+			for (Vector2 start : hallwayGraph.getKeys()) {
+				for (Connection<Vector2> endC : hallwayGraph.getConnections(start)) {
+					sr.line(start, endC.getToNode());
+				}
+//				sr.circle(start.x, start.y, 1.0f);
+			}
+			for (Vector2 debugPoints : points) {
+				sr.circle(debugPoints.x, debugPoints.y, 1.0f);
+			}
+		} else {
+			// DRAW DUNGEON GRAPH
+			sr.setColor(Color.BLACK);
+			for (Room room : dungeonGraph.getKeys()) {
+				for (Connection<Room> edge : dungeonGraph.getConnections(room)) {
+					Room a = edge.getToNode();
+					Room b = edge.getFromNode();
+					sr.line(a.getCenterX(), a.getCenterY(), b.getCenterX(), b.getCenterY());
+				}
+			}
+		}
 	    
+		// DRAW MIDPOINTS OF ROOMS
+		
+		sr.setColor(Color.BLACK);
+		for (Room room : this.getDungeon()) {
+			sr.circle(room.getCenterX(), room.getCenterY(), 3.0f);
+		}
 		
 		sr.end();
 	}
@@ -430,19 +641,13 @@ public class Dungeon {
 		return rooms;
 	}
 	
-	public Room getRoomAtPoint(Vector2 point) {
+	public Room getRoomAtPoint(Vector2 point, RoomType type) {
 		Array<Room> rooms = spatialPartition.get(calculatePartitionKey(point.x, point.y));
 		if (rooms != null) {
-//			Room nonHallway = null; // allows us to prefer hallways over other rooms, uncomment if this behavior is desired
 			for (Room room : rooms) {
-				if (room.getBounds().contains(point)) {
-//					if (roomTypeMap.get(room) == RoomType.HALLWAY) {
-						return room;
-//					} else {
-//						nonHallway = room;
-//					}
+				if (room.getBounds().contains(point) && room.getType() == type) {
+					return room;
 				}
-//				return nonHallway;
 			}
 		}
 		return null;

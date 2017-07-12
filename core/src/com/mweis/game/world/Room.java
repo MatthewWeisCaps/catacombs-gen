@@ -17,9 +17,7 @@ public class Room implements Comparable<Room> {
 	
 	public enum RoomType { CRITICAL, NONCRITICAL, HALLWAY; }
 	private RoomType type;
-	
-//	private Doorway leftDoorway, rightDoorway, topDoorway, bottomDoorway;
-	
+		
 	public Room(int x1, int y1, int width, int height) {		
         this(x1, y1, width, height, null);
 	}
@@ -127,54 +125,6 @@ public class Room implements Comparable<Room> {
 	public void setType(RoomType type) {
 		this.type = type;
 	}
-	
-//	public boolean hasLeftDoorway() {
-//		return leftDoorway != null;
-//	}
-//	
-//	public Doorway getLeftDoorway() {
-//		return leftDoorway;
-//	}
-//	
-//	public void setLeftDoorway(Doorway leftDoorway) {
-//		this.leftDoorway = leftDoorway;
-//	}
-//
-//	public boolean hasRightDoorway() {
-//		return rightDoorway != null;
-//	}
-//	
-//	public Doorway getRightDoorway() {
-//		return rightDoorway;
-//	}
-//	
-//	public void setRightDoorway(Doorway rightDoorway) {
-//		this.rightDoorway = rightDoorway;
-//	}
-//	
-//	public boolean hasTopDoorway() {
-//		return topDoorway != null;
-//	}
-//	
-//	public Doorway getTopDoorway() {
-//		return topDoorway;
-//	}
-//	
-//	public void setTopDoorway(Doorway topDoorway) {
-//		this.topDoorway = topDoorway;
-//	}
-//	
-//	public boolean hasBottomDoorway() {
-//		return bottomDoorway != null;
-//	}
-//	
-//	public Doorway getBottomDoorway() {
-//		return bottomDoorway;
-//	}
-//	
-//	public void setBottomDoorway(Doorway bottomDoorway) {
-//		this.bottomDoorway = bottomDoorway;
-//	}
 	
 	public void shift(int x, int y) {
 		_left += x;
