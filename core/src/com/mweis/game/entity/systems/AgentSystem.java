@@ -9,14 +9,12 @@ import com.mweis.game.util.Mappers;
 
 public class AgentSystem extends IntervalIteratingSystem {
 	
-	@SuppressWarnings("unchecked")
 	public AgentSystem(float interval) {
 		super(Family.all(AgentComponent.class).get(), interval);
 	}
 
 	@Override
 	protected void processEntity(Entity entity) {
-		Agent<?, ?> agent = Mappers.agentMapper.get(entity).agent;
-		agent.getStateMachine().update();
+		Mappers.agentMapper.get(entity).agent.getStateMachine().update();
 	}
 }

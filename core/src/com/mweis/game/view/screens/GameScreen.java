@@ -36,6 +36,8 @@ import com.mweis.game.world.WorldFactory;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
+
+
 public class GameScreen implements Screen {
 	
 	private Engine engine;
@@ -47,19 +49,19 @@ public class GameScreen implements Screen {
 	private OrthographicCamera camera;
 	
 	private World world; // ref to dungeon world for now
-//	private Dungeon dungeon;
-	private HexDungeon dungeon;
+	private Dungeon dungeon;
+//	private HexDungeon dungeon;
 	
 	@Override
 	public void show() {
 		
 		// hex change
-//		dungeon = new Dungeon(DungeonFactory.generateDungeon());
-//		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f); // IF SLOW LOADING TIME, be less precise (increase value)
+		dungeon = new Dungeon(DungeonFactory.generateDungeon());
+		world = WorldFactory.createWorldFromDungeon(dungeon, 0.25f, 1.0f); // IF SLOW LOADING TIME, be less precise (increase value)
 		
 		// hex change
-		world = new World(Vector2.Zero, true);
-		dungeon = new HexDungeon(world);
+//		world = new World(Vector2.Zero, true);
+//		dungeon = new HexDungeon(world);
 		
 		
 		
@@ -83,9 +85,9 @@ public class GameScreen implements Screen {
 		Box2dFilterBuilder playerFilter = new Box2dFilterBuilder(FilterCategory.FRIENDLY_MOB);
 		playerFilter.enableAllMaskCategories();
 		
-//		playerBody = Box2dBodyFactory.createDynamicCircle(dungeon.getStartRoom().getCenter(), playerFilter, world);
+		playerBody = Box2dBodyFactory.createDynamicCircle(dungeon.getStartRoom().getCenter(), playerFilter, world);
 		// hex change
-		playerBody = Box2dBodyFactory.createDynamicCircle(Vector2.Zero, playerFilter, world);
+//		playerBody = Box2dBodyFactory.createDynamicCircle(Vector2.Zero, playerFilter, world);
 		
 		Agent<PlayerAgent, PlayerState> agent = new PlayerAgent(playerBody);
 		AgentComponent<PlayerAgent, PlayerState> ac = new AgentComponent<PlayerAgent, PlayerState>(agent);
@@ -102,9 +104,9 @@ public class GameScreen implements Screen {
 		zombieFilter.enableAllMaskCategories();
 		
 		
-//		Body zombieBody = Box2dBodyFactory.createDynamicCircle(dungeon.getStartRoom().getCenter().cpy().add(5, 5), zombieFilter, world);
+		Body zombieBody = Box2dBodyFactory.createDynamicCircle(dungeon.getStartRoom().getCenter().cpy().add(5, 5), zombieFilter, world);
 		// hex change
-		Body zombieBody = Box2dBodyFactory.createDynamicCircle(new Vector2(5.0f, 5.0f), zombieFilter, world);
+//		Body zombieBody = Box2dBodyFactory.createDynamicCircle(new Vector2(5.0f, 5.0f), zombieFilter, world);
 
 		
 		
@@ -133,7 +135,7 @@ public class GameScreen implements Screen {
 		camera.update();
 		
 		// hex change
-//		dungeon.render(camera.combined);
+		dungeon.render(camera.combined);
 		
 		rayHandler.setCombinedMatrix(camera);
 		rayHandler.render();

@@ -8,7 +8,7 @@ public class PlayerAgent extends Agent<PlayerAgent, PlayerState> {
 	
 	public PlayerAgent(Body body) {
 		super(body);
-//		super.setBody(body);
+//		super.setBody(body); no longer needed
 		super.setStateMachine(new DefaultStateMachine<PlayerAgent, PlayerState>(this));
 		super.getStateMachine().changeState(PlayerState.DEFAULT);
 	}

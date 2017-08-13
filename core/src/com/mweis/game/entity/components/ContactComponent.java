@@ -3,6 +3,7 @@ package com.mweis.game.entity.components;
 import java.util.function.BiConsumer;
 
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.sun.istack.internal.Nullable;
 
 public class ContactComponent /* implements Component */ {
 	
@@ -11,7 +12,7 @@ public class ContactComponent /* implements Component */ {
 	/*
 	 * Either can be null if only one behavior is desired.
 	 */
-	public ContactComponent(BiConsumer<Fixture, Fixture> beginContact, BiConsumer<Fixture, Fixture> endContact) {
+	public ContactComponent(@Nullable BiConsumer<Fixture, Fixture> beginContact, @Nullable BiConsumer<Fixture, Fixture> endContact) {
 		this.beginContact = beginContact;
 		this.endContact = endContact;
 	}

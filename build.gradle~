@@ -21,8 +21,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
-        hexVersion = '3.0.0'
-        rxVersion = '1.1.0'
+	hexVersion = '3.0.0'
     }
 
     repositories {
@@ -58,8 +57,7 @@ project(":core") {
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        compile "org.codetome:hexameter-core:$hexVersion"
-        compile "io.reactivex:rxjava:$rxVersion"
+	compile "org.codetome:hexameter-core:$hexVersion"
     }
 }
 

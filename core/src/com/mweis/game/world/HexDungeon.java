@@ -1,22 +1,21 @@
 package com.mweis.game.world;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+
+import org.codetome.hexameter.core.api.Hexagon;
+import org.codetome.hexameter.core.api.HexagonalGrid;
+import org.codetome.hexameter.core.api.HexagonalGridBuilder;
+import org.codetome.hexameter.core.api.HexagonalGridLayout;
+import org.codetome.hexameter.core.api.contract.SatelliteData;
+
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.utils.IntMap;
-import com.mweis.game.util.hex.Hex;
-import com.mweis.game.util.hex.HexLayout;
-import com.mweis.game.util.hex.HexOrientation;
+import com.badlogic.gdx.utils.Array;
+
+import rx.functions.Action1;
 
 public class HexDungeon {
 	
+	/*
 	IntMap<Hex> map;
-	
 	public HexDungeon(World world) {
 		int width = 10;
 		int height = 5;
@@ -55,7 +54,75 @@ public class HexDungeon {
 				
 			}
 		}
-		
+	}
+	*/
+	class SomeData implements SatelliteData {
+
+		@Override
+		public double getMovementCost() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public boolean isOpaque() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isPassable() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void setMovementCost(double arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setOpaque(boolean arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setPassable(boolean arg0) {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
+	
+	public HexDungeon(World world) {
+			
+		HexagonalGridBuilder<SomeData> hgb = new HexagonalGridBuilder<SomeData>();
+		hgb.setGridHeight(10);
+		hgb.setGridWidth(10);
+		hgb.setGridLayout(HexagonalGridLayout.RECTANGULAR);
+		hgb.setRadius(50.0d);
+		HexagonalGrid<SomeData> grid = hgb.build();
+		
+		Array<Hexagon<SomeData>> arr = new Array<Hexagon<SomeData>>(hgb.getGridHeight() * hgb.getGridWidth());
+		grid.getHexagons().forEach(new Action1<Hexagon<SomeData>>() {
+			@Override
+			public void call(Hexagon<SomeData> arg0) {
+				/*
+				 * 
+				 * https://github.com/Hexworks/hexameter/blob/eaa705c79b8e6b10fbd3d00f5edd805f0133534a/hexameter-examples/hexameter-rest-example/src/main/java/org/codetome/hexameter/restexample/dto/GridDto.java
+				 */
+			}
+		});
+	}
 }
+
+
+
+
+
+
+
+
+
